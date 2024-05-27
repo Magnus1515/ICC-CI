@@ -90,40 +90,49 @@ class TicTacToe:
         else:
             return 0
 
-    def minimax(self, player):
+    def alpha_beta_search(self, player, alpha, beta):
+        if self.terminals():
+            return self.utility(), None
 
-        if self.terminals(): # firts check is game is over
-            return self.utility(), None # just return the utility of it
-        
-        if player == 'x': # in case of player is x we start here
-            max_eval = float('-inf') # this is the same as - x number but a little bit more complex 
-            best_move = None # declare our best_move as None to use it in our for loop
-            for action in self.actions(): # with self.actions() we get our posible actions in that position 
-                new_board = np.copy(self.board) # i get a copy of the board to work on it
-                self.results(action, player) # now, we apply the move for that use results is that transition results(action, player)
-                score, _ = self.minimax('o') # we do a recursion run and just save score, the only thing we need but now for the other player
-                self.board = new_board  # restore the board in our local board as self.board
-                if score > max_eval: # the most complex thing and hard to get to is compare the score to the max_eval and replace them, to get te max values in this case
-                    max_eval, best_move = score, action
-            return max_eval, best_move
-        else: # in case of player is o we start here
-            min_eval = float('inf') # this is the same as - x number but a little bit more complex 
-            best_move = None # declare our best_move as None to use it in our for loop
-            for action in self.actions():  # with self.actions() we get our posible actions in that position 
-                new_board = np.copy(self.board) # i get a copy of the board to work on it
-                self.results(action, player) # now, we apply the move for that use results is that transition results(action, player)
-                score, _ = self.minimax('x') # we do a recursion run and just save score, the only thing we need but now for the other player
-                self.board = new_board  # restore the board in our local board as self.board
-                if score < min_eval: # the most complex thing and hard to get to is compare the score to the max_eval and replace them, to get te min values in this case now is min
-                    min_eval, best_move = score, action
-            return min_eval, best_move # and finally just return those values
+        if player == 'x':
+            value = float('-inf')
+            best_move = None
+            for action in self.actions():
+                new_board = np.copy(self.board)
+                self.results(action, player)
+                score, _ = self.alpha_beta_search('o', alpha, beta)
+                self.board = new_board
+                if score > value:
+                    value, best_move = score, action
+                alpha = max(alpha, value)
+                if alpha >= beta:
+                    break
+            return value, best_move
+        else:
+            value = float('inf')
+            best_move = None
+            for action in self.actions():
+                new_board = np.copy(self.board)
+                self.results(action, player)
+                score, _ = self.alpha_beta_search('x', alpha, beta)
+                self.board = new_board
+                if score < value:
+                    value, best_move = score, action
+                beta = min(beta, value)
+                if beta <= alpha:
+                    break
+            return value, best_move
+
         
     def best_move(self): # in order to get the best move we use this funtion to call our minimax function
-        return self.minimax(self.player_turn())[1] # and just return the call of the information of player turn, our only parameter and just get the second parameter which is just the best move
+        alpha = float('-inf')
+        beta = float('inf')
+        return self.alpha_beta_search(self.player_turn(), alpha, beta)[1]  # Now passing alpha and beta
     
 # initilize the bot    
 bot = TicTacToe()
 player_var = str(input("Which player want to be, enter 'x' or 'o', please enter in lowercase -> "))
+
 
 if player_var == 'x':
     while bot.terminals() == False:
@@ -162,7 +171,6 @@ if player_var == 'x':
 elif player_var == "o":
     while bot.terminals() == False:
         
-
         move = bot.best_move()
         print(f"Best move for '{bot.player_turn()}':", move)
         bot.results(move ,bot.player_turn())
@@ -192,3 +200,4 @@ elif player_var == "o":
         print("The game has ended, the winner is", winner)
     else:
         print("The game has ended in a draw.")
+

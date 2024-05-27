@@ -125,6 +125,7 @@ class TicTacToe:
 bot = TicTacToe()
 player_var = str(input("Which player want to be, enter 'x' or 'o', please enter in lowercase -> "))
 
+
 if player_var == 'x':
     while bot.terminals() == False:
         
@@ -135,6 +136,7 @@ if player_var == 'x':
             if bot.board[x_1,x_2] == '0':
                 bot.results((x_1,x_2),bot.player_turn())
                 bot.print_tic_tac_toe()
+                break
                 
         except ValueError:
             print("Invalid input! Please enter numeric indices.")
@@ -192,3 +194,4 @@ elif player_var == "o":
         print("The game has ended, the winner is", winner)
     else:
         print("The game has ended in a draw.")
+
